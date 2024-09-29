@@ -6,7 +6,7 @@ static void instr_execute_1op() {
     vaddr_write(cpu.esp, SREG_SS, data_size / 8, opr_src.val);
 }
 
-make_instr_impl_1op(push, r, l)
+make_instr_impl_1op(push, r, v)
 make_instr_impl_1op(push, i, v)
 make_instr_impl_1op(push, i, b)
 
