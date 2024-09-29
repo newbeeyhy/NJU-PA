@@ -24,7 +24,7 @@ make_instr_func(pop_es) {
 
     print_asm_1("pop", "", len, &r);
 
-    return 0;
+    return 3;
 }
 
 make_instr_func(pop_ss) {
@@ -41,7 +41,7 @@ make_instr_func(pop_ss) {
 
     print_asm_1("pop", "", len, &r);
 
-    return 0;
+    return 3;
 }
 
 make_instr_func(pop_ds) {
@@ -58,5 +58,5 @@ make_instr_func(pop_ds) {
 
     print_asm_1("pop", "", len, &r);
 
-    return 0;
+    return 3;
 }

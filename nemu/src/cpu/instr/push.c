@@ -23,7 +23,7 @@ make_instr_func(push_es) {
 
     print_asm_1("push", "", len, &r);
 
-    return 0;
+    return 3;
 }
 
 make_instr_func(push_cs) {
@@ -39,7 +39,7 @@ make_instr_func(push_cs) {
 
     print_asm_1("push", "", len, &r);
 
-    return 0;
+    return 3;
 }
 
 make_instr_func(push_ss) {
@@ -55,7 +55,7 @@ make_instr_func(push_ss) {
 
     print_asm_1("push", "", len, &r);
 
-    return 0;
+    return 3;
 }
 
 make_instr_func(push_ds) {
@@ -71,7 +71,7 @@ make_instr_func(push_ds) {
 
     print_asm_1("push", "", len, &r);
 
-    return 0;
+    return 3;
 }
 
 make_instr_func(push_fs) {
@@ -87,7 +87,7 @@ make_instr_func(push_fs) {
 
     print_asm_1("push", "", len, &r);
 
-    return 0;
+    return 3;
 }
 
 make_instr_func(push_gs) {
@@ -103,5 +103,5 @@ make_instr_func(push_gs) {
 
     print_asm_1("push", "", len, &r);
 
-    return 0;
+    return 3;
 }
