@@ -14,6 +14,7 @@ make_instr_func(pop_es) {
     OPERAND r;
 
     r.type = OPR_SREG;
+    r.sreg = SREG_ES;
     r.addr = 0;
     r.data_size = 16;
 
@@ -22,7 +23,7 @@ make_instr_func(pop_es) {
     cpu.esp += 2;
     operand_write(&r);
 
-    print_asm_1("pop", "", len, &r);
+    print_asm_1("pop", "", 3, &r);
 
     return 3;
 }
@@ -31,6 +32,7 @@ make_instr_func(pop_ss) {
     OPERAND r;
 
     r.type = OPR_SREG;
+    r.sreg = SREG_SS;
     r.addr = 2;
     r.data_size = 16;
 
@@ -39,7 +41,7 @@ make_instr_func(pop_ss) {
     cpu.esp += 2;
     operand_write(&r);
 
-    print_asm_1("pop", "", len, &r);
+    print_asm_1("pop", "", 3, &r);
 
     return 3;
 }
@@ -48,6 +50,7 @@ make_instr_func(pop_ds) {
     OPERAND r;
 
     r.type = OPR_SREG;
+    r.sreg = SREG_DS;
     r.addr = 3;
     r.data_size = 16;
 
@@ -56,7 +59,7 @@ make_instr_func(pop_ds) {
     cpu.esp += 2;
     operand_write(&r);
 
-    print_asm_1("pop", "", len, &r);
+    print_asm_1("pop", "", 3, &r);
 
     return 3;
 }

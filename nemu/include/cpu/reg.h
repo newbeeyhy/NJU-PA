@@ -124,10 +124,10 @@ enum {
 };
 
 enum {
-	SREG_ES, // * 特殊类型访问（如movs）
-	SREG_CS, // * 代码段（对应eip）
-	SREG_SS, // * 堆栈访问（对应esp和ebp）
-	SREG_DS, // * 数据访问
+	SREG_ES, /* 特殊类型访问（如movs） */
+	SREG_CS, /* 代码段（对应eip） */
+	SREG_SS, /* 堆栈访问（对应esp和ebp） */
+	SREG_DS, /* 数据访问 */
 	SREG_FS,
 	SREG_GS
 };
