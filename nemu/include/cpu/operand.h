@@ -8,10 +8,10 @@
 // operand type for immediate number, register, and memory
 enum {
 	OPR_IMM, // * opr->addr中保存的是一个立即数的内存地址（位于代码段）
-	OPR_REG, // * opr->addr中保存的是一个通用寄存器的编号，随着opr->data_size的不同，其对应关系略有不同。参照nemu/include/cpu/reg.h中定义的enum数据结构
+	OPR_REG, // * opr->addr中保存的是一个通用寄存器的编号，随着opr->data_size的不同，其对应关系略有不同，eax, ecx, edx, ebx, esp, ebp, esi, edi
 	OPR_MEM, // * opr->addr中保存的是一个内存地址（位于数据段或栈段）
 	OPR_CREG, // * opr->addr中保存的是一个控制寄存器的编号CRx, x=0,1,2,3
-	OPR_SREG // * opr->addr中保存的是一个段寄存器的编号，参照nemu/include/cpu/reg.h中定义的enum数据结构
+	OPR_SREG // * opr->addr中保存的是一个段寄存器的编号，es, cs, ss, ds, fs, gs
 };
 
 #define MEM_ADDR_NA 0xffffffff

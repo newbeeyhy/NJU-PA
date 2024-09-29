@@ -7,6 +7,8 @@ instr_execute_1op() {
 }
 
 make_instr_impl_1op(push, r, l)
+make_instr_impl_1op(push, i, v)
+make_instr_impl_1op(push, i, b)
 
 make_instr_func(push_es) {
     OPERAND r;
