@@ -1,6 +1,6 @@
 #include "cpu/instr.h"
 
-instr_execute_1op() {
+static void instr_execute_1op() {
     operand_read(&opr_src);
     cpu.esp -= data_size / 8;
     vaddr_write(cpu.esp, SREG_SS, data_size / 8, opr_src.val);
