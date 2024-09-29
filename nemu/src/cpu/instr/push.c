@@ -10,7 +10,6 @@ make_instr_impl_1op(push, r, l)
 
 make_instr_func(push_es) {
     OPERAND r;
-    int len = 1;
 
     r.type = OPR_SREG;
     r.addr = 0;
@@ -22,12 +21,11 @@ make_instr_func(push_es) {
 
     print_asm_1("push", "", len, &r);
 
-    return len;
+    return 0;
 }
 
 make_instr_func(push_cs) {
     OPERAND r;
-    int len = 1;
 
     r.type = OPR_SREG;
     r.addr = 1;
@@ -39,12 +37,11 @@ make_instr_func(push_cs) {
 
     print_asm_1("push", "", len, &r);
 
-    return len;
+    return 0;
 }
 
 make_instr_func(push_ss) {
     OPERAND r;
-    int len = 1;
 
     r.type = OPR_SREG;
     r.addr = 2;
@@ -56,12 +53,11 @@ make_instr_func(push_ss) {
 
     print_asm_1("push", "", len, &r);
 
-    return len;
+    return 0;
 }
 
 make_instr_func(push_ds) {
     OPERAND r;
-    int len = 1;
 
     r.type = OPR_SREG;
     r.addr = 3;
@@ -73,12 +69,11 @@ make_instr_func(push_ds) {
 
     print_asm_1("push", "", len, &r);
 
-    return len;
+    return 0;
 }
 
 make_instr_func(push_fs) {
     OPERAND r;
-    int len = 1;
 
     r.type = OPR_SREG;
     r.addr = 4;
@@ -90,12 +85,11 @@ make_instr_func(push_fs) {
 
     print_asm_1("push", "", len, &r);
 
-    return len;
+    return 0;
 }
 
 make_instr_func(push_gs) {
     OPERAND r;
-    int len = 1;
 
     r.type = OPR_SREG;
     r.addr = 5;
@@ -107,5 +101,5 @@ make_instr_func(push_gs) {
 
     print_asm_1("push", "", len, &r);
 
-    return len;
+    return 0;
 }
