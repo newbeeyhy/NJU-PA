@@ -1,9 +1,9 @@
 #include "cpu/instr.h"
 
 make_instr_func(call_instr_direct) {
-    uint32_t rel = paddr_read(eip + 1, data_size / 8);
+    uint32_t rel = vaddr_read(eip + 1, SREG_CS, data_size / 8);
     cpu.esp -= 4;
-    paddr_write(cpu.esp, 4, eip + 1 + data_size / 8);
+    vaddr_write(cpu.esp, SREG_SS, 4, eip + 1 + data_size / 8);
     cpu.eip = eip + 1 + data_size / 8 + rel;
     return 0;
 }

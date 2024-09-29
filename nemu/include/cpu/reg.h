@@ -6,7 +6,7 @@
 // define the structure of registers
 typedef struct {
 	// general purpose registers
-    /**
+    /*
      * grp[0] -> eax
      * grp[1] -> ecx
      * grp[2] -> edx
