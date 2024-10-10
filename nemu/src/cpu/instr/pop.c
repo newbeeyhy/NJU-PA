@@ -63,3 +63,39 @@ make_instr_func(pop_ds) {
 
     return 3;
 }
+
+make_instr_func(pop_fs) {
+    OPERAND r;
+
+    r.type = OPR_SREG;
+    r.sreg = SREG_FS;
+    r.addr = 4;
+    r.data_size = 16;
+
+    operand_read(&r);
+    r.val = vaddr_read(cpu.esp, SREG_SS, 2);
+    cpu.esp += 2;
+    operand_write(&r);
+
+    print_asm_1("pop", "", 3, &r);
+
+    return 3;
+}
+
+make_instr_func(pop_gs) {
+    OPERAND r;
+
+    r.type = OPR_SREG;
+    r.sreg = SREG_GS;
+    r.addr = 5;
+    r.data_size = 16;
+
+    operand_read(&r);
+    r.val = vaddr_read(cpu.esp, SREG_SS, 2);
+    cpu.esp += 2;
+    operand_write(&r);
+
+    print_asm_1("pop", "", 3, &r);
+
+    return 3;
+}
