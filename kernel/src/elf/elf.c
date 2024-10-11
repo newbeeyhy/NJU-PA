@@ -14,8 +14,7 @@ void ide_read(uint8_t *, uint32_t, uint32_t);
 void create_video_mapping();
 uint32_t get_ucr3();
 
-uint32_t loader()
-{
+uint32_t loader() {
 	Elf32_Ehdr *elf;
 	Elf32_Phdr *ph, *eph;
 
@@ -32,24 +31,17 @@ uint32_t loader()
 	/* Load each program segment */
 	ph = (void *)elf + elf->e_phoff;
 	eph = ph + elf->e_phnum;
-	for (; ph < eph; ph++)
-	{
-		if (ph->p_type == PT_LOAD)
-		{
+	for (; ph < eph; ph++) {
+		if (ph->p_type == PT_LOAD) {
 
-			// remove this panic!!!
-			panic("Please implement the loader");
-
-/* TODO: copy the segment from the ELF file to its proper memory area */
-
-/* TODO: zeror the memory area [vaddr + file_sz, vaddr + mem_sz) */
+			memcpy((void *)ph->p_vaddr, (void *)ph->p_offset, ph->p_filesz);
+			memset((void *)(ph->p_vaddr + ph->p_filesz), 0, ph->p_memsz - ph->p_filesz);
 
 #ifdef IA32_PAGE
 			/* Record the program break for future use */
 			extern uint32_t brk;
 			uint32_t new_brk = ph->p_vaddr + ph->p_memsz - 1;
-			if (brk < new_brk)
-			{
+			if (brk < new_brk) {
 				brk = new_brk;
 			}
 #endif
