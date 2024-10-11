@@ -28,7 +28,6 @@ make_instr_func(jmp_short) {
     operand_read(&rel);
 
     int offset = sign_ext(rel.val, 8);
-    print_asm_1("jmp", "", 2, &rel);
 
     cpu.eip += offset;
 
@@ -38,12 +37,25 @@ make_instr_func(jmp_short) {
 make_instr_func(jmp_rm) {
     OPERAND rm;
     rm.data_size = data_size;
-    int len = modrm_rm(eip + 1, &rm);
+    modrm_rm(eip + 1, &rm);
+
     operand_read(&rm);
 
-    print_asm_1("jmp", "", 1 + len, &rm);
-
     cpu.eip = rm.val;
+
+    return 0;
+}
+
+make_instr_func(jmp_ptr) {
+    OPERAND ptr;
+    ptr.data_size = data_size;
+    ptr.type = OPR_IMM;
+    ptr.sreg = SREG_CS;
+    ptr.addr = eip + 1;
+
+    operand_read(&ptr);
+
+    cpu.eip = ptr.val;
 
     return 0;
 }
