@@ -1,7 +1,10 @@
 #include "nemu.h"
 #include "cpu/reg.h"
 #include "memory/memory.h"
+#include "cpu/cpu.h"
 
+#include <elf.h>
+#include <string.h>
 #include <stdlib.h>
 
 /* We use the POSIX regex functions to process regular expressions.
@@ -114,7 +117,7 @@ static bool make_token(char *e) {
 				char *substr_start = e + position;
 				int substr_len = pmatch.rm_eo;
 
-				printf("match regex[%d] at position %d with len %d: %.*s\n", i, position, substr_len, substr_len, substr_start);
+				// printf("match regex[%d] at position %d with len %d: %.*s\n", i, position, substr_len, substr_len, substr_start);
 				position += substr_len;
 
 				/* TODO: Now a new token is recognized with rules[i]. 
@@ -133,6 +136,15 @@ static bool make_token(char *e) {
 					nr_token++;
 					break;
 				case DEC:
+					tokens[nr_token].type = rules[i].token_type;
+					for (int j = 0; j < substr_len; j++) {
+						tokens[nr_token].str[j] = substr_start[j];
+					}
+					tokens[nr_token].str[substr_len] = '\0';
+					nr_token++;
+					break;
+				case REG:
+				case SYMB:
 					tokens[nr_token].type = rules[i].token_type;
 					for (int j = 0; j < substr_len; j++) {
 						tokens[nr_token].str[j] = substr_start[j];
@@ -189,32 +201,70 @@ bool check_parentheses(int p, int q) {
 		return false;
 	}
 }
-// ( 1 + 1 ) + ( 1 + 1 )
-// 0 1 2 3 4 5 6 7 8 9 10
+
+extern char *strtab;
+extern Elf32_Sym *symtab;
+extern int nr_symtab_entry;
+
 uint32_t eval(int p, int q) {
     if(p > q) {
         return 0;
     } else if(p == q) { 
+
         /* Single token.
          * For now this token should be a number. 
          * Return the value of the number.
          */ 
-		uint32_t res = 0;
-		if (tokens[p].type == DEC) {
-			for (int i = 0; tokens[p].str[i] != 0; i++) {
-				res = res * 10 + num(tokens[p].str[i]);
+		
+		if (tokens[p].type == REG) {
+			if (strcmp(tokens[p].str, "$eax") == 0) {
+				return cpu.eax;
+			} else if (strcmp(tokens[p].str, "$ecx") == 0) {
+				return cpu.ecx;
+			} else if (strcmp(tokens[p].str, "$edx") == 0) {
+				return cpu.edx;
+			} else if (strcmp(tokens[p].str, "$ebx") == 0) {
+				return cpu.ebx;
+			} else if (strcmp(tokens[p].str, "$esp") == 0) {
+				return cpu.esp;
+			} else if (strcmp(tokens[p].str, "$ebp") == 0) {
+				return cpu.ebp;
+			} else if (strcmp(tokens[p].str, "$esi") == 0) {
+				return cpu.esi;
+			} else if (strcmp(tokens[p].str, "$edi") == 0) {
+				return cpu.edi;
 			}
-		} else {
-			for (int i = 0; tokens[p].str[i] != 0; i++) {
-				res = res * 16 + num(tokens[p].str[i]);
+		} else if (tokens[p].type == HEX || tokens[p].type == DEC) {
+			uint32_t res = 0;
+			if (tokens[p].type == DEC) {
+				for (int i = 0; tokens[p].str[i] != 0; i++) {
+					res = res * 10 + num(tokens[p].str[i]);
+				}
+			} else {
+				for (int i = 0; tokens[p].str[i] != 0; i++) {
+					res = res * 16 + num(tokens[p].str[i]);
+				}
+			}
+			return res;
+		} else if (tokens[p].type == SYMB) {
+			char *sym = tokens[p].str;
+			char str[32];
+			for (int i = 0; i < nr_symtab_entry; i++) {
+				strcpy(str, strtab + symtab[i].st_name);
+				if (strcmp(sym, str) == 0) {
+					return symtab[i].st_value;
+				}
 			}
 		}
-		return res;
+
     } else if(check_parentheses(p, q) == true) {
+
         /* The expression is surrounded by a matched pair of parentheses. 
          * If that is the case, just throw away the parentheses.
          */
+
         return eval(p + 1, q - 1); 
+
     } else {
 		int op = -1;
 		int op_type = 0;
@@ -232,9 +282,9 @@ uint32_t eval(int p, int q) {
 				op_type = tokens[i].type;
 				break;
 			}
-			
 		}
 		if (op == -1) {
+
 			cnt = 0;
 			for (int i = p; i <= q; i++) {
 				if (tokens[i].type == '(') {
@@ -244,11 +294,12 @@ uint32_t eval(int p, int q) {
 					cnt--;
 					continue;
 				}
-				if (cnt == 0 && (tokens[i].type == '!')) {
+				if (cnt == 0 && (tokens[i].type == '!' || tokens[i].type == DEREF)) {
 					op = i;
 					op_type = tokens[i].type;
 				}
 			}
+
 			cnt = 0;
 			for (int i = p; i <= q; i++) {
 				if (tokens[i].type == '(') {
@@ -263,6 +314,7 @@ uint32_t eval(int p, int q) {
 					op_type = tokens[i].type;
 				}
 			}
+
 			cnt = 0;
 			for (int i = p; i <= q; i++) {
 				if (tokens[i].type == '(') {
@@ -277,6 +329,7 @@ uint32_t eval(int p, int q) {
 					op_type = tokens[i].type;
 				}
 			}
+
 			cnt = 0;
 			for (int i = p; i <= q; i++) {
 				if (tokens[i].type == '(') {
@@ -295,6 +348,7 @@ uint32_t eval(int p, int q) {
 					op_type = tokens[i].type;
 				}
 			}
+
 			cnt = 0;
 			for (int i = p; i <= q; i++) {
 				if (tokens[i].type == '(') {
@@ -310,13 +364,16 @@ uint32_t eval(int p, int q) {
 				}
 			}
 		}
-        uint32_t val1 = eval(p, op - 1);
+        
+		uint32_t val1 = eval(p, op - 1);
         uint32_t val2 = eval(op + 1, q);
+
         switch(op_type) {
             case '+': return val1 + val2;
             case '-': return val1 - val2;
             case '*': return val1 * val2;
             case '/': return val1 / val2;
+			case DEREF: return vaddr_read(val2, SREG_DS, 4);
 			case EQ: return val1 == val2;
 			case NEQ: return val1 != val2;
 			case LEQ: return val1 <= val2;
@@ -326,9 +383,10 @@ uint32_t eval(int p, int q) {
 			case AND: return val1 && val2;
 			case OR: return val1 || val2;
 			case '!': return !val2;
-            default: assert(0);
+            default: break;
         }
     }
+	assert(0);
 }
 
 uint32_t expr(char *e, bool *success) {
