@@ -13,6 +13,8 @@ make_instr_func(call_instr_direct) {
     vaddr_write(cpu.esp, SREG_SS, 4, eip + 1 + data_size / 8);
     cpu.eip = eip + 1 + data_size / 8 + imm.val;
 
+    print_asm_1("call", "", 1 + data_size / 8, &imm);
+
     return 0;
 }
 
@@ -26,6 +28,8 @@ make_instr_func(call_instr_indirect) {
     cpu.esp -= 4;
     vaddr_write(cpu.esp, SREG_SS, 4, eip + 1 + len);
     cpu.eip = rm.val;
+
+    print_asm_1("call", "", 1 + len, &rm);
 
     return 0;
 }

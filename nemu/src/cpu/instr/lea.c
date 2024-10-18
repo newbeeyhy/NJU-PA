@@ -5,9 +5,13 @@ make_instr_func(lea) {
 
     r.data_size = rm.data_size = data_size;
 
-    int len = modrm_r_rm(cpu.eip + 1, &r, &rm);
+    int len = 1;
+    len += modrm_r_rm(cpu.eip + 1, &r, &rm);
     r.val = rm.addr;
 
     operand_write(&r);
-    return 1 + len;
+
+    print_asm_2("lea", "", len, &rm, &r);
+
+    return len;
 }
