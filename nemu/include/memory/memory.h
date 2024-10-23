@@ -7,7 +7,7 @@
 #include "memory/mmu/segment.h"
 #include "memory/mmu/page.h"
 
-// 1MB memory
+// 128MB memory
 #define MEM_SIZE_B 128 * 1024 * 1024
 
 extern uint8_t hw_mem[];
