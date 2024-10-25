@@ -91,7 +91,7 @@ typedef struct token {
 Token tokens[32];
 int nr_token;
 
-int num(char c) {
+static int num(char c) {
 	if (c >= '0' && c <= '9') {
 		return c - '0';
 	} else if (c >= 'a' && c <= 'f') {
@@ -170,7 +170,7 @@ static bool make_token(char *e) {
 	return true;
 }
 
-bool check_parentheses(int p, int q) {
+static bool check_parentheses(int p, int q) {
 	int cnt = 0;
 	for (int i = p; i <= q; i++) {
 		if (tokens[i].type == '(') {
@@ -206,7 +206,27 @@ extern char *strtab;
 extern Elf32_Sym *symtab;
 extern int nr_symtab_entry;
 
-uint32_t eval(int p, int q) {
+static int tokens_priority(int type) {
+	switch (type) {
+		case '!': return 5;
+		case DEREF: return 5;
+		case '*': return 4;
+		case '/': return 4;
+		case '+': return 3;
+		case '-': return 3;
+		case '<': return 2;
+		case '>': return 2;
+		case LEQ: return 2;
+		case GEQ: return 2;
+		case EQ: return 2;
+		case NEQ: return 2;
+		case AND: return 1;
+		case OR: return 0;
+		default: return 0x7fffffff;
+	}
+}
+
+static uint32_t eval(int p, int q) {
     if(p > q) {
         return 0;
     } else if(p == q) { 
@@ -284,7 +304,6 @@ uint32_t eval(int p, int q) {
 			}
 		}
 		if (op == -1) {
-
 			cnt = 0;
 			for (int i = p; i <= q; i++) {
 				if (tokens[i].type == '(') {
@@ -294,71 +313,7 @@ uint32_t eval(int p, int q) {
 					cnt--;
 					continue;
 				}
-				if (cnt == 0 && (tokens[i].type == '!' || tokens[i].type == DEREF)) {
-					op = i;
-					op_type = tokens[i].type;
-				}
-			}
-
-			cnt = 0;
-			for (int i = p; i <= q; i++) {
-				if (tokens[i].type == '(') {
-					cnt++;
-					continue;
-				} else if (tokens[i].type == ')') {
-					cnt--;
-					continue;
-				}
-				if (cnt == 0 && (tokens[i].type == '*' || tokens[i].type == '/')) {
-					op = i;
-					op_type = tokens[i].type;
-				}
-			}
-
-			cnt = 0;
-			for (int i = p; i <= q; i++) {
-				if (tokens[i].type == '(') {
-					cnt++;
-					continue;
-				} else if (tokens[i].type == ')') {
-					cnt--;
-					continue;
-				}
-				if (cnt == 0 && (tokens[i].type == '+' || tokens[i].type == '-')) {
-					op = i;
-					op_type = tokens[i].type;
-				}
-			}
-
-			cnt = 0;
-			for (int i = p; i <= q; i++) {
-				if (tokens[i].type == '(') {
-					cnt++;
-					continue;
-				} else if (tokens[i].type == ')') {
-					cnt--;
-					continue;
-				}
-				if (cnt == 0 && (tokens[i].type == '<' || tokens[i].type == '>' 
-													   || tokens[i].type == LEQ 
-													   || tokens[i].type == GEQ
-													   || tokens[i].type == EQ
-													   || tokens[i].type == NEQ)) {
-					op = i;
-					op_type = tokens[i].type;
-				}
-			}
-
-			cnt = 0;
-			for (int i = p; i <= q; i++) {
-				if (tokens[i].type == '(') {
-					cnt++;
-					continue;
-				} else if (tokens[i].type == ')') {
-					cnt--;
-					continue;
-				}
-				if (cnt == 0 && (tokens[i].type == AND || tokens[i].type == OR)) {
+				if (cnt == 0 && tokens_priority(tokens[i].type) < tokens_priority(op_type)) {
 					op = i;
 					op_type = tokens[i].type;
 				}
