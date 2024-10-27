@@ -2,6 +2,7 @@
 #include "monitor/ui.h"
 #include "monitor/breakpoint.h"
 #include "cpu/cpu.h"
+#include "memory/memory.h"
 
 #include <stdlib.h>
 #include <readline/readline.h>
@@ -218,6 +219,44 @@ cmd_handler(cmd_d)
 	return 0;
 }
 
+cmd_handler(cmd_x) {
+	if (args == NULL)
+	{
+		goto x_error;
+	}
+
+	char *p = strtok(NULL, " ");
+
+	if (p == NULL)
+	{
+		goto x_error;
+	}
+
+	args += strlen(p) + 1;
+	int start;
+	sscanf(p, "%d", &start);
+
+	bool success;
+	uint32_t len = expr(args, &success);
+	if (!success)
+	{
+		printf("invalid expression: '%s'\n", args);
+	}
+	else
+	{
+		int i;
+		for (i = 0; i < len; i++)
+		{
+			printf("0x%08x: 0x%08x\n", start + i, paddr_read(start + i * 4, 4));
+		}
+	}
+	return 0;
+
+x_error:
+	puts("Command format: \"x N EXPR\"");
+	return 0;
+}
+
 cmd_handler(cmd_help);
 
 static struct
@@ -238,7 +277,7 @@ static struct
 	/* TODO: Add more commands */
 	{"si", "Single Step Execution", cmd_si},
 	{"info", "Print register and watch point info", cmd_info},
-
+	{"x", "Scan memory", cmd_x},
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
