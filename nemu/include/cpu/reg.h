@@ -3,6 +3,46 @@
 
 #include "nemu.h"
 
+#ifdef IA32_SEG
+typedef struct {
+	uint32_t limit :16;
+	uint32_t base :32;
+} GDTR;
+
+typedef union {
+	struct {
+		uint32_t pe :1;
+		uint32_t mp :1;
+		uint32_t em :1;
+		uint32_t ts :1;
+		uint32_t et :1;
+		uint32_t reserve :26;
+		uint32_t pg :1;
+	};
+	uint32_t val; 	
+} CR0;
+
+typedef struct {
+	// the 16-bit visible part, i.e., the selector
+	union {
+		uint16_t val;
+		struct {
+			uint32_t rpl :2;
+			uint32_t ti :1;
+			uint32_t index :13;
+		};
+	};
+	// the invisible part, i.e., cache part
+	struct {
+		uint32_t base;
+		uint32_t limit;
+		uint32_t type :5;
+		uint32_t privilege_level :2;
+		uint32_t soft_use :1;
+	};
+} SegReg;
+#endif
+
 // define the structure of registers
 typedef struct {
 	// general purpose registers
@@ -63,9 +103,16 @@ typedef struct {
 	GDTR gdtr; // GDTR, todo: define type GDTR
 	// segment registers, todo: define type SegReg
 	union {
+		/*
+		 * segReg[0] -> ES
+		 * segReg[1] -> CS
+		 * segReg[2] -> SS
+		 * segReg[3] -> DS
+		 * segReg[4] -> FS
+		 * segReg[5] -> GS
+		 */
 		SegReg segReg[6];
-		struct
-		{
+		struct {
 			SegReg es, cs, ss, ds, fs, gs;
 		};
 	};
