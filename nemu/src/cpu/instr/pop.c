@@ -8,3 +8,8 @@ static void instr_execute_1op() {
 
 make_instr_impl_1op(pop, r, v)
 make_instr_impl_1op(pop, rm, v)
+make_instr_impl_1op(pop, ss, w)
+make_instr_impl_1op(pop, ds, w)
+make_instr_impl_1op(pop, es, w)
+make_instr_impl_1op(pop, fs, w)
+make_instr_impl_1op(pop, gs, w)

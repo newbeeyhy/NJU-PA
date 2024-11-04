@@ -1,6 +1,8 @@
-.PHONY: nemu run run-kernel debug game clean test_pa-1 test_pa-2-1 test_pa-2-2 test_pa-2-3 test_pa-3-1 test_pa-3-2 test_pa-3-3 test_pa-4-1 test_pa-4-2 test_pa-4-3 test_batch-2-2-mute test_batch-3-3-mute
+.PHONY: nemu run run-kernel debug game clean test_pa-1 test_pa-2-1 test_pa-2-2 test_pa-2-3 test_pa-3-1 test_pa-3-2 test_pa-3-3 test_pa-4-1 test_pa-4-2 test_pa-4-3 submit_pa-1 submit_pa-2-1 submit_pa-2-2 submit_pa-2-3 submit_pa-3-1 submit_pa-3-2 submit_pa-3-3 submit_pa-4-1 submit_pa-4-2 submit_pa-4-3 test_batch-2-2-mute test_batch-3-3-mute
 
 include Makefile.git
+
+Submit_Script = scripts/submit
 
 nemu: 
 	$(call git_commit, "compile nemu testcase kernel", $(TIME_MAKE))
@@ -10,11 +12,11 @@ nemu:
 
 run: nemu
 	$(call git_commit, "run", $(TIME_MAKE))
-	./nemu/nemu --testcase add
+	./nemu/nemu --testcase my_case
 
 run-kernel: nemu
 	$(call git_commit, "run-kernel", $(TIME_MAKE))
-	./nemu/nemu --kernel --testcase add
+	./nemu/nemu --testcase add --kernel
 
 debug: nemu
 	$(call git_commit, "debug", $(TIME_MAKE))
@@ -55,40 +57,41 @@ test_pa-1: nemu
 	./nemu/nemu --test-fpu sub
 	./nemu/nemu --test-fpu mul
 	./nemu/nemu --test-fpu div
-
+	
 test_pa-2-1: nemu 
 	$(call git_commit, "test_pa-2-1", $(TIME_MAKE))
 	./nemu/nemu --autorun --testcase mov
 	./nemu/nemu --autorun --testcase mov-cmp
+	./nemu/nemu --autorun --testcase movsx
 	./nemu/nemu --autorun --testcase mov-c
 	./nemu/nemu --autorun --testcase mov-jcc
+	./nemu/nemu --autorun --testcase sum
 	./nemu/nemu --autorun --testcase add
-	./nemu/nemu --autorun --testcase add-longlong
-	./nemu/nemu --autorun --testcase if-else
+	./nemu/nemu --autorun --testcase matrix-mul-small
 	./nemu/nemu --autorun --testcase fib
-	./nemu/nemu --autorun --testcase bubble-sort
-	./nemu/nemu --autorun --testcase quick-sort
-	./nemu/nemu --autorun --testcase select-sort
+	./nemu/nemu --autorun --testcase wanshu
+	./nemu/nemu --autorun --testcase prime
+	./nemu/nemu --autorun --testcase pascal 
+	./nemu/nemu --autorun --testcase matrix-mul
+	./nemu/nemu --autorun --testcase if-else
 	./nemu/nemu --autorun --testcase max
 	./nemu/nemu --autorun --testcase min3
-	./nemu/nemu --autorun --testcase pascal
-	./nemu/nemu --autorun --testcase bit 
-	./nemu/nemu --autorun --testcase movsx
-	./nemu/nemu --autorun --testcase sub-longlong
-	./nemu/nemu --autorun --testcase fact
-	./nemu/nemu --autorun --testcase gotbaha
 	./nemu/nemu --autorun --testcase leap-year
-	./nemu/nemu --autorun --testcase matrix-mul-small
-	./nemu/nemu --autorun --testcase matrix-mul
-	./nemu/nemu --autorun --testcase mul-longlong 
-	./nemu/nemu --autorun --testcase prime
+	./nemu/nemu --autorun --testcase select-sort
+	./nemu/nemu --autorun --testcase bubble-sort
+	./nemu/nemu --autorun --testcase quick-sort
+	./nemu/nemu --autorun --testcase gotbaha
 	./nemu/nemu --autorun --testcase shuixianhua
-	./nemu/nemu --autorun --testcase sum
-	./nemu/nemu --autorun --testcase wanshu
 	./nemu/nemu --autorun --testcase struct
+	./nemu/nemu --autorun --testcase fact
+	./nemu/nemu --autorun --testcase bit
+	./nemu/nemu --autorun --testcase mul-longlong 
+	./nemu/nemu --autorun --testcase sub-longlong
+	./nemu/nemu --autorun --testcase add-longlong
 	./nemu/nemu --autorun --testcase string
-	./nemu/nemu --autorun --testcase hello-str 
+	./nemu/nemu --autorun --testcase hello-str
 	./nemu/nemu --autorun --testcase test-float
+
 
 test_pa-2-2: nemu 
 	$(call git_commit, "test_pa-2-2", $(TIME_MAKE))
@@ -126,6 +129,48 @@ test_pa-4-3: nemu game
 	$(call git_commit, "test_pa-4-3", $(TIME_MAKE))
 	./nemu/nemu --test-game $(STU_ID) --kernel --autorun
 
+
+# submit to different stages of PA
+
+submit_pa-1: 
+	$(call git_commit, "submit_pa-1", $(TIME_MAKE))
+	$(Submit_Script) pa-1 $(STU_ID)
+
+submit_pa-2-1: 
+	$(call git_commit, "submit_pa-2-1", $(TIME_MAKE))
+	$(Submit_Script) pa-2-1 $(STU_ID)
+
+submit_pa-2-2: 
+	$(call git_commit, "submit_pa-2-2", $(TIME_MAKE))
+	$(Submit_Script) pa-2-2 $(STU_ID)
+
+submit_pa-2-3: 
+	$(call git_commit, "submit_pa-2-3", $(TIME_MAKE))
+	$(Submit_Script) pa-2-3 $(STU_ID)
+
+submit_pa-3-1:
+	$(call git_commit, "submit_pa-3-1", $(TIME_MAKE))
+	$(Submit_Script) pa-3-1 $(STU_ID)
+
+submit_pa-3-2: 
+	$(call git_commit, "submit_pa-3-2", $(TIME_MAKE))
+	$(Submit_Script) pa-3-2 $(STU_ID)
+
+submit_pa-3-3: 
+	$(call git_commit, "submit_pa-3-3", $(TIME_MAKE))
+	$(Submit_Script) pa-3-3 $(STU_ID)
+
+submit_pa-4-1: 
+	$(call git_commit, "submit_pa-4-1", $(TIME_MAKE))
+	$(Submit_Script) pa-4-1 $(STU_ID)
+
+submit_pa-4-2: 
+	$(call git_commit, "submit_pa-4-2", $(TIME_MAKE))
+	$(Submit_Script) pa-4-2 $(STU_ID)
+
+submit_pa-4-3: 
+	$(call git_commit, "submit_pa-4-3", $(TIME_MAKE))
+	$(Submit_Script) pa-4-3 $(STU_ID)
 
 # DO NOT call the following targets directly
 

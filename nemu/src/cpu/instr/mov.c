@@ -10,6 +10,8 @@ make_instr_impl_2op(mov, r, rm, b)
 make_instr_impl_2op(mov, r, rm, v)
 make_instr_impl_2op(mov, rm, r, b)
 make_instr_impl_2op(mov, rm, r, v)
+make_instr_impl_2op(mov, rm, r, w)
+make_instr_impl_2op(mov, r, rm, w)
 make_instr_impl_2op(mov, i, rm, b)
 make_instr_impl_2op(mov, i, rm, v)
 make_instr_impl_2op(mov, i, r, b)
@@ -76,5 +78,33 @@ make_instr_func(mov_srm162r_l) {
     operand_write(&r);
 
 	print_asm_2("mov", "", len, &rm, &r);
+    return len;
+}
+
+make_instr_func(mov_r2c_l) {
+    int len = 1;
+    OPERAND rm, r;
+    r.data_size = 32;
+    rm.data_size = 32;
+    len += modrm_r_rm(eip + 1, &r, &rm);
+
+    r.val = cpu.cr0.val;
+    operand_write(&r);
+
+    print_asm_2("mov", "", len, &rm, &r);
+    return len;
+}
+
+make_instr_func(mov_c2r_l) {
+    int len = 1;
+    OPERAND rm, r;
+    r.data_size = 32;
+    rm.data_size = 32;
+    len += modrm_r_rm(eip + 1, &r, &rm);
+
+    operand_read(&r);
+    cpu.cr0.val = r.val;
+
+    print_asm_2("mov", "", len, &r, &rm);
     return len;
 }

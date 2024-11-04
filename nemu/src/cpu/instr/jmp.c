@@ -11,10 +11,10 @@ make_instr_func(jmp_near) {
 
     int offset = sign_ext(rel.val, data_size);
     
-    cpu.eip += offset;
-
     // thank Ting Xu from CS'17 for finding this bug
     print_asm_1("jmp", "", 1 + data_size / 8, &rel);
+
+    cpu.eip += offset;
 
     return 1 + data_size / 8;
 }
@@ -30,9 +30,9 @@ make_instr_func(jmp_short) {
 
     int offset = sign_ext(rel.val, 8);
 
-    cpu.eip += offset;
-
     print_asm_1("jmp", "", 2, &rel);
+
+    cpu.eip += offset;
 
     return 2;
 }
@@ -44,14 +44,19 @@ make_instr_func(jmp_rm) {
 
     operand_read(&rm);
 
-    cpu.eip = rm.val;
-
     print_asm_1("jmp", "", 1 + data_size / 8, &rm);
+
+    cpu.eip = rm.val;
 
     return 0;
 }
 
 make_instr_func(jmp_ptr) {
+#ifdef IA32_SEG
+    cpu.cs.val = paddr_read(cpu.eip + 5, 2);
+    load_sreg(1);
+#endif    
+
     OPERAND ptr;
     ptr.data_size = data_size;
     ptr.type = OPR_IMM;
@@ -60,9 +65,9 @@ make_instr_func(jmp_ptr) {
 
     operand_read(&ptr);
 
-    cpu.eip = ptr.val;
-
     print_asm_1("jmp", "", 1 + data_size / 8, &ptr);
+
+    cpu.eip = ptr.val;
 
     return 0;
 }

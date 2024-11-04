@@ -161,6 +161,36 @@ void print_asm_3(char *instr, char *suffix, uint8_t len, OPERAND *opr_1, OPERAND
 	opr_src.addr = REG_AL;                      \
 	len += 4;
 
+#define decode_operand_cs 						\
+	opr_src.type = OPR_SREG; 					\
+	opr_src.addr = 1;  							\
+	opr_src.sreg = SREG_CS; 					\
+
+#define decode_operand_ss 						\
+	opr_src.type = OPR_SREG; 					\
+	opr_src.addr = 2;  							\
+	opr_src.sreg = SREG_SS; 					\
+
+#define decode_operand_ds 						\
+	opr_src.type = OPR_SREG; 					\
+	opr_src.addr = 3;  							\
+	opr_src.sreg = SREG_DS; 					\
+
+#define decode_operand_es 						\
+	opr_src.type = OPR_SREG; 					\
+	opr_src.addr = 0;  							\
+	opr_src.sreg = SREG_ES; 					\
+
+#define decode_operand_fs 						\
+	opr_src.type = OPR_SREG; 					\
+	opr_src.addr = 4;  							\
+	opr_src.sreg = SREG_FS; 					\
+
+#define decode_operand_gs 						\
+	opr_src.type = OPR_SREG; 					\
+	opr_src.addr = 5;  							\
+	opr_src.sreg = SREG_GS; 					\
+
 // conditions
 // possible condition: e, a, ae, b, be, o, p, s , ne, na, no, np, ns, g, ge, l, le, ecxz
 
