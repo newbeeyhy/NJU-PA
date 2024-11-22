@@ -34,7 +34,12 @@ uint32_t loader() {
 	for (; ph < eph; ph++) {
 		if (ph->p_type == PT_LOAD) {
 
-			uint32_t paddr = mm_malloc(ph->p_vaddr, ph->p_memsz);
+			uint32_t paddr;
+#ifdef IA32_PAGE
+			paddr = mm_malloc(ph->p_vaddr, ph->p_memsz);
+#else
+			paddr = ph->p_vaddr;
+#endif
 			memcpy((void *)paddr, (void *)ph->p_offset, ph->p_filesz);
 			memset((void *)(paddr + ph->p_filesz), 0, ph->p_memsz - ph->p_filesz);
 			

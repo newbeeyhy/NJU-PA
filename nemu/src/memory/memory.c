@@ -22,6 +22,8 @@ uint32_t paddr_read(paddr_t paddr, size_t len) {
 	uint32_t ret = 0;
 #ifdef CACHE_ENABLED
 	ret = cache_read(paddr, len);     // 通过cache进行读
+	uint32_t tmp = hw_mem_read(paddr, len);
+	assert(ret == tmp);		// cache和内存中的数据应该一致
 #else
 	ret = hw_mem_read(paddr, len);
 #endif
@@ -32,6 +34,8 @@ void paddr_write(paddr_t paddr, size_t len, uint32_t data) {
 	assert(len == 1 || len == 2 || len == 4);
 #ifdef CACHE_ENABLED
 	cache_write(paddr, len, data);    // 通过cache进行写
+	uint32_t tmp = hw_mem_read(paddr, len);
+	assert(data == tmp);	// cache和内存中的数据应该一致
 #else
 	hw_mem_write(paddr, len, data);
 #endif
@@ -48,8 +52,8 @@ uint32_t laddr_read(laddr_t laddr, size_t len) {
 			size_t len1 = 0x1000 - offset, len2 = len - len1;
 			laddr1 = page_translate(laddr1);
 			laddr2 = page_translate(laddr2);
-			ret |= paddr_read(laddr1, len1) << (len2 << 3);
-			ret |= paddr_read(laddr2, len2);
+			ret |= paddr_read(laddr1, len1);
+			ret |= paddr_read(laddr2, len2) << (len1 << 3);
 		} else {
 			laddr = page_translate(laddr);
 			ret = paddr_read(laddr, len);
@@ -70,8 +74,8 @@ void laddr_write(laddr_t laddr, size_t len, uint32_t data) {
 			size_t len1 = 0x1000 - offset, len2 = len - len1;
 			laddr1 = page_translate(laddr1);
 			laddr2 = page_translate(laddr2);
-			paddr_write(laddr1, len1, data >> (len2 << 3));
-			paddr_write(laddr2, len2, data & ((len2 << 3) - 1));
+			paddr_write(laddr1, len1, data & ((1 << (len1 << 3)) - 1));
+			paddr_write(laddr2, len2, data >> (len1 << 3));
 		} else {
 			laddr = page_translate(laddr);
 			paddr_write(laddr, len, data);

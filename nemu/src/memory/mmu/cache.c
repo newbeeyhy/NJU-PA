@@ -42,8 +42,8 @@ void cache_write(paddr_t paddr, size_t len, uint32_t data) {
 	// implement me in PA 3-1
 	uint32_t addr = get_addr(paddr);
 	if (addr + len > 64) {
-		cache_write(paddr, 64 - addr, data);
-		cache_write(paddr + 64 - addr, len - 64 + addr, data << ((64 - addr) * 8));
+		cache_write(paddr, 64 - addr, data & ((1 << ((64 - addr) << 3)) - 1));
+		cache_write(paddr + 64 - addr, len - 64 + addr, data >> ((64 - addr) << 3));
 		return;
 	}
 	uint32_t tag = get_tag(paddr), group_id = get_group_id(paddr);
@@ -69,7 +69,7 @@ uint32_t cache_read(paddr_t paddr, size_t len) {
 	if (addr + len > 64) {
 		uint32_t val1 = cache_read(paddr, 64 - addr);
 		uint32_t val2 = cache_read(paddr + 64 - addr, len - 64 + addr);
-		return (val2 << ((64 - addr) * 8)) | val1;
+		return (val2 << ((64 - addr) << 3)) | val1;
 	}
 	uint32_t tag = get_tag(paddr), group_id = get_group_id(paddr);
 	uint32_t ret = 0;
