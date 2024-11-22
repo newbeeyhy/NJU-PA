@@ -5,19 +5,19 @@
 
 #ifdef IA32_SEG
 typedef struct {
-	uint32_t limit :16;
-	uint32_t base :32;
+	uint32_t limit : 16;
+	uint32_t base : 32;
 } GDTR;
 
 typedef union {
 	struct {
-		uint32_t pe :1;
-		uint32_t mp :1;
-		uint32_t em :1;
-		uint32_t ts :1;
-		uint32_t et :1;
-		uint32_t reserve :26;
-		uint32_t pg :1;
+		uint32_t pe : 1;
+		uint32_t mp : 1;
+		uint32_t em : 1;
+		uint32_t ts : 1;
+		uint32_t et : 1;
+		uint32_t reserve : 26;
+		uint32_t pg : 1;
 	};
 	uint32_t val; 	
 } CR0;
@@ -27,20 +27,31 @@ typedef struct {
 	union {
 		uint16_t val;
 		struct {
-			uint32_t rpl :2;
-			uint32_t ti :1;
-			uint32_t index :13;
+			uint32_t rpl : 2;
+			uint32_t ti : 1;
+			uint32_t index : 13;
 		};
 	};
 	// the invisible part, i.e., cache part
 	struct {
 		uint32_t base;
 		uint32_t limit;
-		uint32_t type :5;
-		uint32_t privilege_level :2;
-		uint32_t soft_use :1;
+		uint32_t type : 5;
+		uint32_t privilege_level : 2;
+		uint32_t soft_use : 1;
 	};
 } SegReg;
+#endif
+
+// define the structure of PDBR
+#ifdef IA32_PAGE
+typedef union {
+	struct {
+		uint32_t reserved : 12;
+		uint32_t page_directory_base : 20;
+	};
+	uint32_t val;
+} CR3;
 #endif
 
 // define the structure of registers

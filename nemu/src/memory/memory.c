@@ -18,32 +18,67 @@ void hw_mem_write(paddr_t paddr, size_t len, uint32_t data) {
 }
 
 uint32_t paddr_read(paddr_t paddr, size_t len) {
+	assert(len == 1 || len == 2 || len == 4);
 	uint32_t ret = 0;
-
 #ifdef CACHE_ENABLED
-		ret = cache_read(paddr, len);     // 通过cache进行读
+	ret = cache_read(paddr, len);     // 通过cache进行读
 #else
-		ret = hw_mem_read(paddr, len);
+	ret = hw_mem_read(paddr, len);
 #endif
-
 	return ret;
 }
 
 void paddr_write(paddr_t paddr, size_t len, uint32_t data) {
-
+	assert(len == 1 || len == 2 || len == 4);
 #ifdef CACHE_ENABLED
-		cache_write(paddr, len, data);    // 通过cache进行写
+	cache_write(paddr, len, data);    // 通过cache进行写
 #else
-		hw_mem_write(paddr, len, data);
+	hw_mem_write(paddr, len, data);
 #endif
-
 }
 
 uint32_t laddr_read(laddr_t laddr, size_t len) {
+	assert(len == 1 || len == 2 || len == 4);
+#ifdef IA32_PAGE
+	if (cpu.cr0.pe == 1) {
+		uint32_t ret = 0;
+		uint32_t offset = laddr & 0xfff;
+		if (offset + len > 0x1000) {
+			uint32_t laddr1 = laddr , laddr2 = (laddr + 0x1000 - offset);
+			size_t len1 = 0x1000 - offset, len2 = len - len1;
+			laddr1 = page_translate(laddr1);
+			laddr2 = page_translate(laddr2);
+			ret |= paddr_read(laddr1, len1) << (len2 << 3);
+			ret |= paddr_read(laddr2, len2);
+		} else {
+			laddr = page_translate(laddr);
+			ret = paddr_read(laddr, len);
+		}
+		return ret;
+	}
+#endif
 	return paddr_read(laddr, len);
 }
 
 void laddr_write(laddr_t laddr, size_t len, uint32_t data) {
+	assert(len == 1 || len == 2 || len == 4);
+#ifdef IA32_PAGE
+	if (cpu.cr0.pe == 1) {
+		uint32_t offset = laddr & 0xfff;
+		if (offset + len > 0x1000) {
+			uint32_t laddr1 = laddr , laddr2 = (laddr + 0x1000 - offset);
+			size_t len1 = 0x1000 - offset, len2 = len - len1;
+			laddr1 = page_translate(laddr1);
+			laddr2 = page_translate(laddr2);
+			paddr_write(laddr1, len1, data >> (len2 << 3));
+			paddr_write(laddr2, len2, data & ((len2 << 3) - 1));
+		} else {
+			laddr = page_translate(laddr);
+			paddr_write(laddr, len, data);
+		}
+		return;
+	}
+#endif
 	paddr_write(laddr, len, data);
 }
 
@@ -70,16 +105,13 @@ void vaddr_write(vaddr_t vaddr, uint8_t sreg, size_t len, uint32_t data) {
 void init_mem() {
 	// clear the memory on initiation
 	memset(hw_mem, 0, MEM_SIZE_B);
-
 #ifdef CACHE_ENABLED
 	init_cache();                             // 初始化cache
 #endif
-
 #ifdef TLB_ENABLED
 	make_all_tlb();
 	init_all_tlb();
 #endif
-
 }
 
 uint32_t instr_fetch(vaddr_t vaddr, size_t len) {
