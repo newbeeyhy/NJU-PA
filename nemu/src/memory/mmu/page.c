@@ -14,7 +14,7 @@ paddr_t page_translate(laddr_t laddr) {
 	PTE ptable;
 	ptable.val = paddr_read((pdir.page_frame << 12) | (page << 2), 4);
 	assert(ptable.present == 1);
-	uint32_t paddr = paddr_read((ptable.page_frame << 12) | offset, 4);
+	uint32_t paddr = (ptable.page_frame << 12) | offset;
 	return paddr;
 #else
 	assert(0);

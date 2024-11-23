@@ -81,30 +81,44 @@ make_instr_func(mov_srm162r_l) {
     return len;
 }
 
-make_instr_func(mov_r2c_l) {
+make_instr_func(mov_c2r_l) {
     int len = 1;
-    OPERAND rm, r;
-    r.data_size = 32;
+    OPERAND rm, cr;
+    uint8_t op;
     rm.data_size = 32;
-    len += modrm_r_rm(eip + 1, &r, &rm);
+    len += modrm_opcode_rm(eip + 1, &op, &rm);
+    assert(op == 0);
 
-    r.val = cpu.cr0.val;
-    operand_write(&r);
+    cr.type = OPR_CREG;
+    cr.addr = op;
 
-    print_asm_2("mov", "", len, &rm, &r);
+    rm.val = cpu.cr0.val;
+    operand_write(&rm);
+
+    print_asm_2("mov", "", len, &cr, &rm);
+
     return len;
 }
 
-make_instr_func(mov_c2r_l) {
+make_instr_func(mov_r2c_l) {
     int len = 1;
-    OPERAND rm, r;
-    r.data_size = 32;
+    OPERAND rm, cr;
+    uint8_t op;
     rm.data_size = 32;
-    len += modrm_r_rm(eip + 1, &r, &rm);
+    len += modrm_opcode_rm(eip + 1, &op, &rm);
+    assert(op == 0 || op == 3);
 
-    operand_read(&r);
-    cpu.cr0.val = r.val;
+    cr.type = OPR_CREG;
+    cr.addr = op;
 
-    print_asm_2("mov", "", len, &r, &rm);
+    operand_read(&rm);
+    if (op == 0) {
+        cpu.cr0.val = rm.val;
+    } else if (op == 3) {
+        cpu.cr3.val = rm.val;
+    }
+
+    print_asm_2("mov", "", len, &rm, &cr);
+
     return len;
 }
