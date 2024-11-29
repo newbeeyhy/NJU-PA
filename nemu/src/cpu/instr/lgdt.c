@@ -21,6 +21,6 @@ make_instr_func(lgdt) {
 
     return len;
 #else
-    return 0;
+    assert(0);
 #endif
 }

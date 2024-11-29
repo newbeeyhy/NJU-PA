@@ -9,7 +9,7 @@ uint32_t segment_translate(uint32_t offset, uint8_t sreg) {
 #ifdef IA32_SEG
 	return cpu.segReg[sreg].base + offset;
 #else
-	return 0;
+	assert(0);
 #endif
 }
 
@@ -32,5 +32,7 @@ void load_sreg(uint8_t sreg) {
 	assert(cpu.segReg[sreg].base == 0);
 	assert(cpu.segReg[sreg].limit == 0xfffff);
 	assert(segDesc.granularity == 1);
+#else
+	assert(0);
 #endif
 }

@@ -21,9 +21,9 @@ uint32_t paddr_read(paddr_t paddr, size_t len) {
 	assert(len == 1 || len == 2 || len == 4);
 	uint32_t ret = 0;
 #ifdef CACHE_ENABLED
-	ret = cache_read(paddr, len);     // 通过cache进行读
+	ret = cache_read(paddr, len);
 	uint32_t tmp = hw_mem_read(paddr, len);
-	assert(ret == tmp);		// cache和内存中的数据应该一致
+	assert(ret == tmp);
 #else
 	ret = hw_mem_read(paddr, len);
 #endif
@@ -33,9 +33,9 @@ uint32_t paddr_read(paddr_t paddr, size_t len) {
 void paddr_write(paddr_t paddr, size_t len, uint32_t data) {
 	assert(len == 1 || len == 2 || len == 4);
 #ifdef CACHE_ENABLED
-	cache_write(paddr, len, data);    // 通过cache进行写
+	cache_write(paddr, len, data);
 	uint32_t tmp = hw_mem_read(paddr, len);
-	assert(data == tmp);	// cache和内存中的数据应该一致
+	assert(data == tmp);
 #else
 	hw_mem_write(paddr, len, data);
 #endif
@@ -110,7 +110,7 @@ void init_mem() {
 	// clear the memory on initiation
 	memset(hw_mem, 0, MEM_SIZE_B);
 #ifdef CACHE_ENABLED
-	init_cache();                             // 初始化cache
+	init_cache();
 #endif
 #ifdef TLB_ENABLED
 	make_all_tlb();
