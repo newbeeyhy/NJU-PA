@@ -11,5 +11,6 @@ make_instr_func(push_ds_w);
 make_instr_func(push_es_w);
 make_instr_func(push_fs_w);
 make_instr_func(push_gs_w);
+make_instr_func(pusha);
 
 #endif

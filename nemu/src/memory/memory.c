@@ -18,7 +18,6 @@ void hw_mem_write(paddr_t paddr, size_t len, uint32_t data) {
 }
 
 uint32_t paddr_read(paddr_t paddr, size_t len) {
-	assert(len == 1 || len == 2 || len == 4);
 	uint32_t ret = 0;
 #ifdef CACHE_ENABLED
 	ret = cache_read(paddr, len);
@@ -31,7 +30,6 @@ uint32_t paddr_read(paddr_t paddr, size_t len) {
 }
 
 void paddr_write(paddr_t paddr, size_t len, uint32_t data) {
-	assert(len == 1 || len == 2 || len == 4);
 #ifdef CACHE_ENABLED
 	cache_write(paddr, len, data);
 	uint32_t tmp = hw_mem_read(paddr, len);
@@ -42,7 +40,6 @@ void paddr_write(paddr_t paddr, size_t len, uint32_t data) {
 }
 
 uint32_t laddr_read(laddr_t laddr, size_t len) {
-	assert(len == 1 || len == 2 || len == 4);
 #ifdef IA32_PAGE
 	if (cpu.cr0.pg == 1) {
 		uint32_t ret = 0;
@@ -65,7 +62,6 @@ uint32_t laddr_read(laddr_t laddr, size_t len) {
 }
 
 void laddr_write(laddr_t laddr, size_t len, uint32_t data) {
-	assert(len == 1 || len == 2 || len == 4);
 #ifdef IA32_PAGE
 	if (cpu.cr0.pg == 1) {
 		uint32_t offset = laddr & 0xfff;

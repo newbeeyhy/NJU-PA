@@ -3,10 +3,11 @@
 
 #include "nemu.h"
 
+// define the structure of GDTR
 #ifdef IA32_SEG
 typedef struct {
 	uint32_t limit : 16;
-	uint32_t base : 32;
+	uint32_t base;
 } GDTR;
 
 typedef union {
@@ -52,6 +53,14 @@ typedef union {
 	};
 	uint32_t val;
 } CR3;
+#endif
+
+// define the structure of IDTR
+#ifdef IA32_INTR
+typedef struct {
+	uint32_t limit : 16;
+	uint32_t base;
+} IDTR;
 #endif
 
 // define the structure of registers
@@ -132,6 +141,7 @@ typedef struct {
 #else
 	uint8_t dummy_seg[142]; // make __ref_ instructions safe to use
 #endif
+
 #ifdef IA32_PAGE
 	// control registers, todo: define type CR3
 	CR3 cr3;

@@ -82,6 +82,7 @@ make_instr_func(mov_srm162r_l) {
 }
 
 make_instr_func(mov_c2r_l) {
+#ifdef IA32_SEG
     int len = 1;
     OPERAND rm, cr;
     uint8_t op;
@@ -98,9 +99,13 @@ make_instr_func(mov_c2r_l) {
     print_asm_2("mov", "", len, &cr, &rm);
 
     return len;
+#else
+    assert(0);
+#endif
 }
 
 make_instr_func(mov_r2c_l) {
+#ifdef IA32_SEG
     int len = 1;
     OPERAND rm, cr;
     uint8_t op;
@@ -115,10 +120,17 @@ make_instr_func(mov_r2c_l) {
     if (op == 0) {
         cpu.cr0.val = rm.val;
     } else if (op == 3) {
+#ifdef IA32_PAGE
         cpu.cr3.val = rm.val;
+#else
+        assert(0);
+#endif
     }
 
     print_asm_2("mov", "", len, &rm, &cr);
 
     return len;
+#else
+    assert(0);
+#endif
 }

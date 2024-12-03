@@ -8,5 +8,6 @@ make_instr_func(pop_ds_w);
 make_instr_func(pop_es_w);
 make_instr_func(pop_fs_w);
 make_instr_func(pop_gs_w);
+make_instr_func(popa);
 
 #endif
