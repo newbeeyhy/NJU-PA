@@ -9,10 +9,7 @@ static uint32_t pop() {
 make_instr_func(iret) {
     cpu.eip = pop();
     cpu.cs.val = pop();
+    load_sreg(1);
     cpu.eflags.val = pop();
-    cpu.es.val = pop();
-    cpu.ds.val = pop();
-    cpu.fs.val = pop();
-    cpu.gs.val = pop();
     return 1;
 }
