@@ -10,10 +10,10 @@ paddr_t page_translate(laddr_t laddr) {
 	uint32_t offset = laddr & 0xfff;
 	PDE pdir;
 	pdir.val = paddr_read((cpu.cr3.page_directory_base << 12) | (dir << 2), 4);
-	assert(pdir.present == 1);
+	assert(pdir.present);
 	PTE ptable;
 	ptable.val = paddr_read((pdir.page_frame << 12) | (page << 2), 4);
-	assert(ptable.present == 1);
+	assert(ptable.present);
 	uint32_t paddr = (ptable.page_frame << 12) | offset;
 	return paddr;
 #else

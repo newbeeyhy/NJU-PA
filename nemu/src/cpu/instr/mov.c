@@ -86,7 +86,7 @@ make_instr_func(mov_c2r_l) {
     int len = 1;
     OPERAND rm, cr;
     uint8_t op;
-    rm.data_size = 32;
+    rm.data_size = data_size;
     len += modrm_opcode_rm(eip + 1, &op, &rm);
     assert(op == 0);
 
@@ -109,7 +109,7 @@ make_instr_func(mov_r2c_l) {
     int len = 1;
     OPERAND rm, cr;
     uint8_t op;
-    rm.data_size = 32;
+    rm.data_size = data_size;
     len += modrm_opcode_rm(eip + 1, &op, &rm);
     assert(op == 0 || op == 3);
 
