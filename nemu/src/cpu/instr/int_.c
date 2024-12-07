@@ -1,9 +1,13 @@
 #include "cpu/intr.h"
 #include "cpu/instr.h"
 
-static void instr_execute_1op() {
-    operand_read(&opr_src);
+make_instr_func(int__i_b) {
+    OPERAND i;
+    i.data_size = 8;
+    i.type = OPR_IMM;
+	i.sreg = SREG_CS;
+	i.addr = eip + 1;
+	operand_read(&i);
     raise_sw_intr(opr_src.val);
+    return 0;
 }
-
-make_instr_impl_1op(int_, i, b)

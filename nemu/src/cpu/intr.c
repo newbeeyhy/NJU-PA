@@ -2,10 +2,12 @@
 #include "cpu/instr.h"
 #include "memory/memory.h"
 
+#ifdef IA32_INTR
 static void push(uint32_t dest) {
     cpu.esp -= data_size / 8;
     vaddr_write(cpu.esp, SREG_SS, data_size / 8, dest);
 }
+#endif
 
 void raise_intr(uint8_t intr_no)
 {
