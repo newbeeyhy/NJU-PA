@@ -18,27 +18,24 @@ bool has_prefix = false;
 #define sign(x) ((uint32_t)(x) >> 31)
 
 void do_devices();
-void init_cpu(const uint32_t init_eip)
-{
+void init_cpu(const uint32_t init_eip) {
 	cpu.eflags.val = 0x0;
 	fpu.status.val = 0x0;
 	int i = 0;
-	for (i = 0; i < 8; i++)
-	{
+	for (i = 0; i < 8; i++) {
 		cpu.gpr[i].val = 0x0;
 		fpu.regStack[i].val = 0x0;
 	}
 	cpu.eip = init_eip;
 	cpu.esp = (128 << 20) - 16;
-#ifdef IA32_SEG
+#ifdef IA32_SEG								// init cr0 and sreg
 	cpu.cr0.val = 0x0;
 	cpu.gdtr.base = cpu.gdtr.limit = 0x0;
-	for (i = 0; i < 6; i++)
-	{
+	for (i = 0; i < 6; i++) {
 		cpu.segReg[i].val = 0x0;
 	}
 #endif
-#ifdef IA32_INTR
+#ifdef IA32_INTR							// init idtr and intr
 	cpu.idtr.base = cpu.idtr.limit = 0x0;
 	cpu.intr = 0x0;
 	i8259_init();
@@ -46,40 +43,33 @@ void init_cpu(const uint32_t init_eip)
 }
 
 
-void exec(uint32_t n)
-{
+void exec(uint32_t n) {
 	static BP *bp = NULL;
 	verbose = (n <= 100000);
 	int instr_len = 0;
 	bool hit_break_rerun = false;
 
-	if (nemu_state == NEMU_BREAK)
-	{
+	if (nemu_state == NEMU_BREAK) {
 		hit_break_rerun = true;
 	}
 
 	nemu_state = NEMU_RUN;
-	while (n > 0 && nemu_state == NEMU_RUN)
-	{
-		if(!is_nemu_hlt)
-		{
+	while (n > 0 && nemu_state == NEMU_RUN) {
+		if(!is_nemu_hlt) {
 			instr_len = exec_inst();
 			cpu.eip += instr_len;
 			n--;
 
-			if (hit_break_rerun)
-			{
+			if (hit_break_rerun) {
 				resume_breakpoints();
 				hit_break_rerun = false;
 			}
 
 			// check for breakpoints
-			if (nemu_state == NEMU_BREAK)
-			{
+			if (nemu_state == NEMU_BREAK) {
 				// find break in the list
 				bp = find_breakpoint(cpu.eip - 1);
-				if (bp)
-				{
+				if (bp) {
 					// found, then restore the original opcode
 					vaddr_write(bp->addr, SREG_CS, 1, bp->ori_byte);
 					cpu.eip--;
@@ -90,8 +80,7 @@ void exec(uint32_t n)
 			// check for watchpoints
 
 			BP *wp = scan_watchpoint();
-			if (wp != NULL)
-			{
+			if (wp != NULL) {
 				// print_bin_instr(eip_temp, instr_len);
 				// puts(assembly);
 				printf("\n\nHit watchpoint %d at address 0x%08x, expr = %s\n", wp->NO, cpu.eip - instr_len, wp->expr);
@@ -109,26 +98,23 @@ void exec(uint32_t n)
 		do_intr();
 #endif
 	}
-	if (nemu_state == NEMU_STOP)
-	{
+	if (nemu_state == NEMU_STOP) {
 		printf("NEMU2 terminated\n");
 #ifdef IA32_INTR
 		i8259_destroy();
 #endif
 	}
-	else if (n == 0)
-	{
+	else if (n == 0) {
 		nemu_state = NEMU_READY;
 	}
 }
 
-int exec_inst()
-{
+int exec_inst() {
 	uint8_t opcode = 0;
 	// get the opcode
 	opcode = instr_fetch(cpu.eip, 1);
-//printf("opcode = %x, eip = %x\n", opcode, cpu.eip);
-// instruction decode and execution
+	// printf("opcode = %x, eip = %x\n", opcode, cpu.eip);
+	// instruction decode and execution
 #ifdef NEMU_REF_INSTR
 	int len = __ref_opcode_entry[opcode](cpu.eip, opcode);
 #else
@@ -139,10 +125,8 @@ int exec_inst()
 
 #ifdef IA32_INTR
 // do interrupt
-void do_intr()
-{
-	if (cpu.intr && cpu.eflags.IF)
-	{
+void do_intr() {
+	if (cpu.intr && cpu.eflags.IF) {
 		is_nemu_hlt = false;
 		// get interrupt number
 		uint8_t intr_no = i8259_query_intr_no(); // get interrupt number

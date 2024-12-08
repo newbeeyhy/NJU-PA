@@ -7,8 +7,8 @@ static void instr_execute_1op() {
 }
 
 static void push(uint32_t dest) {
-    cpu.esp -= data_size / 8;
-    vaddr_write(cpu.esp, SREG_SS, data_size / 8, dest);
+    cpu.esp -= 4;
+    vaddr_write(cpu.esp, SREG_SS, 4, dest);
 }
 
 make_instr_impl_1op(push, r, v)
@@ -23,14 +23,15 @@ make_instr_impl_1op(push, fs, w)
 make_instr_impl_1op(push, gs, w)
 
 make_instr_func(pusha) {
-    push(cpu.edi);
-    push(cpu.esi);
-    push(cpu.ebp);
-    cpu.esp -= data_size / 8;
-    push(cpu.ebx);
-    push(cpu.edx);
-    push(cpu.ecx);
+    uint32_t temp = cpu.esp;
     push(cpu.eax);
+    push(cpu.ecx);
+    push(cpu.edx);
+    push(cpu.ebx);
+    push(temp);
+    push(cpu.ebp);
+    push(cpu.esi);
+    push(cpu.edi);
     
     print_asm_0("pusha", "", 1);
 

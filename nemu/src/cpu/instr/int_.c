@@ -8,6 +8,6 @@ make_instr_func(int__i_b) {
 	i.sreg = SREG_CS;
 	i.addr = eip + 1;
 	operand_read(&i);
-    raise_sw_intr(opr_src.val);
+    raise_sw_intr(i.val);
     return 0;
 }
