@@ -85,12 +85,10 @@ uint32_t laddr_read(laddr_t laddr, size_t len) {
 		uint32_t ret = 0;
 		uint32_t offset = laddr & 0xfff;
 		if (offset + len > 0x1000) {
-			uint32_t laddr1 = laddr , laddr2 = (laddr + 0x1000 - offset);
-			size_t len1 = 0x1000 - offset, len2 = len - len1;
-			laddr1 = page_translate(laddr1);
-			laddr2 = page_translate(laddr2);
-			ret |= paddr_read(laddr1, len1);
-			ret |= paddr_read(laddr2, len2) << (len1 << 3);
+			for (uint32_t i = 0; i < len; i++) {
+				uint32_t laddr_i = page_translate(offset + i);
+				ret |= paddr_read(laddr_i, 1) << (8 * i);
+			}
 		} else {
 			laddr = page_translate(laddr);
 			ret = paddr_read(laddr, len);
@@ -106,12 +104,10 @@ void laddr_write(laddr_t laddr, size_t len, uint32_t data) {
 	if (cpu.cr0.pg == 1) {
 		uint32_t offset = laddr & 0xfff;
 		if (offset + len > 0x1000) {
-			uint32_t laddr1 = laddr , laddr2 = (laddr + 0x1000 - offset);
-			size_t len1 = 0x1000 - offset, len2 = len - len1;
-			laddr1 = page_translate(laddr1);
-			laddr2 = page_translate(laddr2);
-			paddr_write(laddr1, len1, data & ((1 << (len1 << 3)) - 1));
-			paddr_write(laddr2, len2, data >> (len1 << 3));
+			for (uint32_t i = 0; i < len; i++) {
+				uint32_t laddr_i = page_translate(offset + i);
+				paddr_write(laddr_i, 1, data >> (8 * i) & 0xff);
+			}
 		} else {
 			laddr = page_translate(laddr);
 			paddr_write(laddr, len, data);
