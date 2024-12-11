@@ -8,7 +8,7 @@ make_instr_func(in_i2eax_b) {
 	i.sreg = SREG_CS;
 	i.addr = eip + 1;
 	operand_read(&i);
-    uint8_t data = read_io_port(i.val, 1);
+    uint8_t data = pio_read(i.val, 1);
     cpu.eax = data;
 
     print_asm_1("in", "", 2, &i);
@@ -23,7 +23,7 @@ make_instr_func(in_i2eax_v) {
 	i.sreg = SREG_CS;
 	i.addr = eip + 1;
 	operand_read(&i);
-    uint32_t data = read_io_port(i.val, 4);
+    uint32_t data = pio_read(i.val, data_size / 8);
     cpu.eax = data;
 
     print_asm_1("in", "", 2, &i);
@@ -32,7 +32,7 @@ make_instr_func(in_i2eax_v) {
 }
 
 make_instr_func(in_edx2eax_b) {
-    uint8_t data = read_io_port(cpu.edx, 1);
+    uint8_t data = pio_read(cpu.edx, 1);
     cpu.eax = data;
 
     print_asm_0("in", "", 1);
@@ -41,7 +41,7 @@ make_instr_func(in_edx2eax_b) {
 }
 
 make_instr_func(in_edx2eax_v) {
-    uint32_t data = read_io_port(cpu.edx, 4);
+    uint32_t data = pio_read(cpu.edx, data_size / 8);
     cpu.eax = data;
 
     print_asm_0("in", "", 1);

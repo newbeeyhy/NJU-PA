@@ -7,17 +7,17 @@
 #define NR_PT ((SCR_SIZE + PT_SIZE - 1) / PT_SIZE) // number of page tables to cover the vmem
 
 PDE *get_updir();
+PDE vpdir[NR_PT] align_to_page;
 
 void create_video_mapping()
 {
+	PDE *updir = get_updir();
 
-	/* TODO: create an identical mapping from virtual memory area
-	 * [0xa0000, 0xa0000 + SCR_SIZE) to physical memeory area
-	 * [0xa0000, 0xa0000 + SCR_SIZE) for user program. You may define
-	 * some page tables to create this mapping.
-	 */
+	/* make all PDE invalid */
+	memset(vpdir, 0, NR_PT * sizeof(PDE));
 
-	panic("please implement me");
+	/* create the same mapping above 0xa0000 as the kernel mapping does */
+	memcpy(vpdir, &updir[VMEM_ADDR / PT_SIZE], NR_PT * sizeof(PDE));
 }
 
 void video_mapping_write_test()

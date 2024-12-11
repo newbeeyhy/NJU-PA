@@ -17,7 +17,13 @@ void hw_mem_write(paddr_t paddr, size_t len, uint32_t data) {
 	memcpy(hw_mem + paddr, &data, len);
 }
 
-uint32_t paddr_read(paddr_t paddr, size_t len) {
+#ifdef HAS_DEVICE_VGA
+uint32_t paddr_read_io(paddr_t paddr, size_t len, int map_NO) {
+	return mmio_read(paddr, len, map_NO);
+}
+#endif
+
+uint32_t paddr_read_mm(paddr_t paddr, size_t len) {
 	uint32_t ret = 0;
 #ifdef CACHE_ENABLED
 	ret = cache_read(paddr, len);
@@ -29,13 +35,47 @@ uint32_t paddr_read(paddr_t paddr, size_t len) {
 	return ret;
 }
 
-void paddr_write(paddr_t paddr, size_t len, uint32_t data) {
+#ifdef HAS_DEVICE_VGA
+void paddr_write_io(paddr_t paddr, size_t len, uint32_t data, int map_NO) {
+	mmio_write(paddr, len, data, map_NO);
+}
+#endif
+
+void paddr_write_mm(paddr_t paddr, size_t len, uint32_t data) {
 #ifdef CACHE_ENABLED
 	cache_write(paddr, len, data);
 	uint32_t tmp = hw_mem_read(paddr, len);
 	assert(data == tmp);
 #else
 	hw_mem_write(paddr, len, data);
+#endif
+}
+
+uint32_t paddr_read(paddr_t paddr, size_t len) {
+	uint32_t ret;
+#ifdef HAS_DEVICE_VGA
+	int map_NO = is_mmio(paddr);
+	if (map_NO != -1) {
+		ret = paddr_read_io(paddr, len, map_NO);
+	} else {
+		ret = paddr_read_mm(paddr, len);
+	}
+#else
+	ret = paddr_read_mm(paddr, len);
+#endif
+	return ret;
+}
+
+void paddr_write(paddr_t paddr, size_t len, uint32_t data) {
+#ifdef HAS_DEVICE_VGA
+	int map_NO = is_mmio(paddr);
+	if (map_NO != -1) {
+		paddr_write_io(paddr, len, data, map_NO);
+	} else {
+		paddr_write_mm(paddr, len, data);
+	}
+#else
+	paddr_write_mm(paddr, len, data);
 #endif
 }
 
