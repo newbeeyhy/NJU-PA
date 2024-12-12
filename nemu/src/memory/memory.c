@@ -81,12 +81,11 @@ void paddr_write(paddr_t paddr, size_t len, uint32_t data) {
 
 uint32_t laddr_read(laddr_t laddr, size_t len) {
 #ifdef IA32_PAGE
-	if (cpu.cr0.pg == 1) {
+	if (cpu.cr0.pg == 1 && cpu.cr0.pe) {
 		uint32_t ret = 0;
-		uint32_t offset = laddr & 0xfff;
-		if (offset + len > 0x1000) {
+		if (((laddr + len - 1) >> 12) == (laddr >> 12)) {
 			for (uint32_t i = 0; i < len; i++) {
-				uint32_t laddr_i = page_translate(offset + i);
+				uint32_t laddr_i = page_translate(laddr + i);
 				ret |= paddr_read(laddr_i, 1) << (8 * i);
 			}
 		} else {
@@ -101,11 +100,10 @@ uint32_t laddr_read(laddr_t laddr, size_t len) {
 
 void laddr_write(laddr_t laddr, size_t len, uint32_t data) {
 #ifdef IA32_PAGE
-	if (cpu.cr0.pg == 1) {
-		uint32_t offset = laddr & 0xfff;
-		if (offset + len > 0x1000) {
+	if (cpu.cr0.pg == 1 && cpu.cr0.pe) {
+		if (((laddr + len - 1) >> 12) == (laddr >> 12)) {
 			for (uint32_t i = 0; i < len; i++) {
-				uint32_t laddr_i = page_translate(offset + i);
+				uint32_t laddr_i = page_translate(laddr + i);
 				paddr_write(laddr_i, 1, data >> (8 * i) & 0xff);
 			}
 		} else {

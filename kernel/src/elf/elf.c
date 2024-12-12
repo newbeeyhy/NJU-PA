@@ -40,8 +40,8 @@ uint32_t loader() {
 #else
 			paddr = ph->p_vaddr;
 #endif
-			memcpy((void *)paddr, (void *)ph->p_offset, ph->p_filesz);
-			memset((void *)(paddr + ph->p_filesz), 0, ph->p_memsz - ph->p_filesz);
+			memcpy((void *)paddr, (void *)elf + ph->p_offset, ph->p_filesz);
+			memset((void *)paddr + ph->p_filesz, 0, ph->p_memsz - ph->p_filesz);
 			
 #ifdef IA32_PAGE
 			/* Record the program break for future use */

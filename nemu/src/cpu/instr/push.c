@@ -1,9 +1,14 @@
 #include "cpu/instr.h"
 
 static void instr_execute_1op() {
-    operand_read(&opr_src);
-    cpu.esp -= data_size / 8;
-    vaddr_write(cpu.esp, SREG_SS, data_size / 8, opr_src.val);
+    uint32_t old_esp = cpu.esp;
+	cpu.esp -= data_size / 8;
+	operand_read(&opr_src);
+	if (opr_src.addr == 0x4) {
+		vaddr_write(cpu.esp, SREG_CS, (data_size / 8), old_esp);
+	} else {
+		vaddr_write(cpu.esp, SREG_CS, (data_size / 8), opr_src.val);
+    }
 }
 
 static void push(uint32_t dest) {
