@@ -6,6 +6,8 @@
 void cache_init(void);
 void cache_writeback(void);
 uint8_t read_byte(uint32_t);
+uint32_t read_long(uint32_t);
+uint32_t read_buf(uint8_t *, uint32_t);
 void write_byte(uint32_t, uint8_t);
 
 void add_irq_handle(int, void (*)(void));
@@ -20,6 +22,24 @@ void ide_read(uint8_t *buf, uint32_t offset, uint32_t len)
 	for (i = 0; i < len; i++)
 	{
 		buf[i] = read_byte(offset + i);
+	}
+}
+
+void ide_read_long(uint8_t *buf, uint32_t offset, uint32_t len)
+{
+	uint32_t i;
+	for (i = 0; i < len; i += 4)
+	{
+		(*(uint32_t *)(buf + i)) = read_long(offset + i);
+	}
+}
+
+void ide_read_buf(uint8_t *buf, uint32_t offset, uint32_t len)
+{
+	uint32_t i, step;
+	for (i = 0; i < len; i += step)
+	{
+		step = read_buf(buf + i, offset + i);
 	}
 }
 

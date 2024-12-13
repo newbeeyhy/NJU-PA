@@ -68,6 +68,31 @@ read_byte(uint32_t offset)
 	return ptr->content[offset & 511];
 }
 
+uint32_t
+read_long(uint32_t offset)
+{
+	uint32_t sector = offset >> 9; // div by 512
+	struct SectorCache *ptr = cache_fetch(sector);
+	uint32_t ret = 0;
+	for (uint32_t i = 0; i < 4; i++) {
+		ret |= ptr->content[(offset + i) & 511] << (i * 8);
+	}
+	return ret;
+}
+
+uint32_t
+read_buf(uint8_t *buf, uint32_t offset)
+{
+	uint32_t sector = offset >> 9; // div by 512
+	struct SectorCache *ptr = cache_fetch(sector);
+	uint32_t ret = 0;
+	for (uint32_t i = offset & 511; i < 512; i++) {
+		buf[ret] = ptr->content[i];
+		ret++;
+	}
+	return ret;
+}
+
 void write_byte(uint32_t offset, uint8_t data)
 {
 	uint32_t sector = offset >> 9;

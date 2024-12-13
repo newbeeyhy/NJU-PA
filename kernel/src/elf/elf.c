@@ -12,6 +12,9 @@
 #define STACK_SIZE (1 << 20)
 
 void ide_read(uint8_t *, uint32_t, uint32_t);
+void ide_read_long(uint8_t *, uint32_t, uint32_t);
+void ide_read_buf(uint8_t *, uint32_t, uint32_t);
+
 void create_video_mapping();
 uint32_t get_ucr3();
 
@@ -21,9 +24,7 @@ uint32_t loader() {
 
 #ifdef HAS_DEVICE_IDE
 	uint8_t buf[ELF_SIZE];
-	for (uint32_t offset = 0; offset < ELF_SIZE; offset += 4096) {
-	    ide_read(buf + offset, ELF_OFFSET_IN_DISK + offset, 4096);
-	}
+	ide_read_buf(buf, ELF_OFFSET_IN_DISK, ELF_SIZE);
 	elf = (void *)buf;
 	Log("ELF loading from hard disk.");
 #else
