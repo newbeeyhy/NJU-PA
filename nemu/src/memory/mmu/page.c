@@ -5,9 +5,11 @@
 paddr_t page_translate(laddr_t laddr) {
 #ifndef TLB_ENABLED
 #ifdef IA32_PAGE
+#ifdef HAS_DEVICE_VGA
 	if (laddr >= 0xa0000 && laddr < 0xa0000 + 320 * 200) {
 		return laddr;
 	}
+#endif
 	uint32_t dir = (laddr >> 22) & 0x3ff;
 	uint32_t page = (laddr >> 12) & 0x3ff;
 	uint32_t offset = laddr & 0xfff;
