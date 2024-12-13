@@ -5,6 +5,9 @@
 paddr_t page_translate(laddr_t laddr) {
 #ifndef TLB_ENABLED
 #ifdef IA32_PAGE
+	if (laddr >= 0xa0000 && laddr < 0xa0000 + 320 * 200) {
+		return laddr;
+	}
 	uint32_t dir = (laddr >> 22) & 0x3ff;
 	uint32_t page = (laddr >> 12) & 0x3ff;
 	uint32_t offset = laddr & 0xfff;

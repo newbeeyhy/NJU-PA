@@ -6,6 +6,7 @@
 
 #ifdef HAS_DEVICE_IDE
 #define ELF_OFFSET_IN_DISK 0
+#define ELF_SIZE (4096 * 512)
 #endif
 
 #define STACK_SIZE (1 << 20)
@@ -19,8 +20,10 @@ uint32_t loader() {
 	Elf32_Phdr *ph, *eph;
 
 #ifdef HAS_DEVICE_IDE
-	uint8_t buf[4096];
-	ide_read(buf, ELF_OFFSET_IN_DISK, 4096);
+	uint8_t buf[ELF_SIZE];
+	for (uint32_t offset = 0; offset < ELF_SIZE; offset += 4096) {
+	    ide_read(buf + offset, ELF_OFFSET_IN_DISK + offset, 4096);
+	}
 	elf = (void *)buf;
 	Log("ELF loading from hard disk.");
 #else
@@ -40,7 +43,7 @@ uint32_t loader() {
 #else
 			paddr = ph->p_vaddr;
 #endif
-			memcpy((void *)paddr, (void *)elf + ph->p_offset, ph->p_filesz);
+			memcpy((void *)paddr, (void *)(elf) + ph->p_offset, ph->p_filesz);
 			memset((void *)paddr + ph->p_filesz, 0, ph->p_memsz - ph->p_filesz);
 			
 #ifdef IA32_PAGE
@@ -63,5 +66,6 @@ uint32_t loader() {
 #endif
 	write_cr3(get_ucr3());
 #endif
+    // assert(0);
 	return entry;
 }
