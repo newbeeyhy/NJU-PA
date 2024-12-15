@@ -66,16 +66,6 @@ typedef struct {
 // define the structure of registers
 typedef struct {
 	// general purpose registers
-    /*
-     * grp[0] -> eax
-     * grp[1] -> ecx
-     * grp[2] -> edx
-     * grp[3] -> ebx
-     * grp[4] -> esp
-     * grp[5] -> ebp
-     * grp[6] -> esi
-     * grp[7] -> edi
-     */
 	union {
 		union {
 			union {

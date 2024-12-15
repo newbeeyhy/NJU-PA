@@ -10,13 +10,17 @@ make_instr_func(ret_near) {
 }
 
 make_instr_func(ret_near_i16) {
-    uint32_t dest_addr = vaddr_read(cpu.esp, SREG_CS, 4);
-	cpu.esp += data_size / 8;
+    OPERAND imm;
+    imm.data_size = 16;
+    imm.type = OPR_IMM;
+    imm.addr = cpu.eip + 1;
+    imm.sreg = SREG_CS;
 
-	cpu.eip = dest_addr;
-	
-	uint16_t imm = vaddr_read(eip + 1, SREG_CS, 2);
-	cpu.esp += imm;
+    operand_read(&imm);
+
+    cpu.eip = vaddr_read(cpu.esp, SREG_SS, data_size / 8);
+    cpu.esp += data_size / 8;
+    cpu.esp += imm.val;
 
     print_asm_1("ret", "", 3, &imm);
     

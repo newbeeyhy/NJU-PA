@@ -20,6 +20,22 @@ void create_video_mapping()
 		}
 	}
 */
+/*
+	PDE *pdir = (PDE *)va_to_pa(get_updir());
+	PTE *ptable = (PTE *)va_to_pa(table);
+    uint32_t pdir_idx, ptable_idx, pframe_idx;
+	//fill PDE and PTEs 
+    pdir_idx = 0x0;
+	pdir[pdir_idx].val = make_pde(ptable);
+	//pdir[pdir_idx + KOFFSET / PT_SIZE].val = make_pde(ptable);
+    ptable += 0x0;
+	pframe_idx = 0x0;
+	for (ptable_idx = 0x0; ptable_idx < 1024; ptable_idx++){
+	    ptable->val = make_pte(pframe_idx << 12);
+		pframe_idx++;
+		ptable++;
+	}
+*/
 }
 
 void video_mapping_write_test()
