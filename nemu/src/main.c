@@ -65,12 +65,6 @@ static void single_run(const char *img_file_path, const char *elf_file_path)
 	printf("NEMU load and execute img: \033[1m\033[32m%s\033[0m  elf: \033[1m\033[36m%s\033[0m\n", img_file_path, elf_file_path);
 	load_exec(img_file_path, LOAD_OFF); // Load the memory image of executable
 #ifdef HAS_DEVICE_IDE
-	// FILE *file = fopen(elf_file_path, "rb");
-	// assert(file != 0);
-	// fseek(file, 0, SEEK_END);
-	// long size = ftell(file);
-	// printf("The size of elf is: %ld\n", size);
-	// fclose(file);
 	init_ide(elf_file_path); // Initialize hard drive
 #else
 	load_exec(elf_file_path, 0);

@@ -43,7 +43,11 @@ uint32_t loader() {
 #else
 			paddr = ph->p_vaddr;
 #endif
+#ifdef HAS_DEVICE_IDE
 			ide_read((void *)paddr, ph->p_offset, ph->p_filesz);
+#else
+			memcpy((void *)paddr, (void *)elf + ph->p_offset, ph->p_filesz);
+#endif
 			memset((void *)paddr + ph->p_filesz, 0, ph->p_memsz - ph->p_filesz);
 			
 #ifdef IA32_PAGE
